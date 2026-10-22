@@ -1,0 +1,13 @@
+{
+  "name": "Remly",
+  "short_name": "Remly",
+  "description": "People, meetings, keeping in touch",
+  "theme_color": "#f5f3ee",
+  "background_color": "#f5f3ee",
+  "display": "standalone",
+  "scope": "./",
+  "start_url": "./",
+  "icons": [
+    { "src": "icons/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
