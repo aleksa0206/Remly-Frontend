@@ -1,0 +1,136 @@
+<a class="skip-link" href="#main">Skip to content</a>
+
+<ng-template #newMenu>
+  <div class="menu" cdkMenu>
+    <button type="button" class="menu__item" cdkMenuItem (cdkMenuItemTriggered)="editors.meeting()">
+      <app-icon name="history" /> Log a meeting
+    </button>
+    <button
+      type="button"
+      class="menu__item"
+      cdkMenuItem
+      (cdkMenuItemTriggered)="editors.meeting({ planned: true })"
+    >
+      <app-icon name="calendar" /> Plan a meeting
+    </button>
+    <button type="button" class="menu__item" cdkMenuItem (cdkMenuItemTriggered)="editors.contact()">
+      <app-icon name="userPlus" /> Contact
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #userMenu>
+  @if (auth.user(); as user) {
+    <div class="menu" cdkMenu>
+      <div class="user-menu__header">
+        <strong>{{ user | fullName }}</strong>
+        <span class="text-meta">{{ user.email }}</span>
+      </div>
+      <div class="menu__separator"></div>
+      <a class="menu__item" cdkMenuItem routerLink="/account">
+        <app-icon name="user" /> Your account
+      </a>
+      <div class="menu__separator"></div>
+      <button type="button" class="menu__item" cdkMenuItem (cdkMenuItemTriggered)="auth.logout()">
+        <app-icon name="logout" /> Sign out
+      </button>
+    </div>
+  }
+</ng-template>
+
+<div class="shell">
+  <aside class="sidebar">
+    <a class="brand" routerLink="/" aria-label="Remly overview">
+      <span class="wordmark">remly<span class="wordmark__dot" aria-hidden="true">.</span></span>
+    </a>
+
+    <button type="button" class="btn new-button" [cdkMenuTriggerFor]="newMenu">
+      <app-icon name="plus" />
+      New
+      <app-icon name="chevronDown" [size]="14" class="new-button__chevron" />
+    </button>
+
+    <nav class="nav" aria-label="Main navigation">
+      <ul>
+        @for (item of nav; track item.path) {
+          <li>
+            <a
+              class="nav__link"
+              [routerLink]="item.path"
+              routerLinkActive="is-active"
+              [routerLinkActiveOptions]="{ exact: !!item.exact }"
+              ariaCurrentWhenActive="page"
+            >
+              <app-icon [name]="item.icon" [size]="17" />
+              {{ item.label }}
+            </a>
+          </li>
+        }
+      </ul>
+    </nav>
+
+    <div class="sidebar__footer">
+      @if (auth.user(); as user) {
+        <button
+          type="button"
+          class="sidebar__user"
+          [cdkMenuTriggerFor]="userMenu"
+          aria-label="Account menu"
+        >
+          <app-avatar [person]="user" [size]="28" />
+          <span class="sidebar__user-text">
+            <span class="sidebar__user-name">{{ user | fullName }}</span>
+            <span class="text-meta">{{ user.email }}</span>
+          </span>
+          <app-icon name="more" [size]="16" />
+        </button>
+      }
+    </div>
+  </aside>
+
+  <div class="shell__main">
+    <header class="topbar">
+      <a class="brand brand--compact" routerLink="/" aria-label="Remly overview">
+        <span class="wordmark">remly<span class="wordmark__dot" aria-hidden="true">.</span></span>
+      </a>
+      <span class="topbar__spacer"></span>
+      <button
+        type="button"
+        class="btn btn--primary btn--icon"
+        [cdkMenuTriggerFor]="newMenu"
+        aria-label="New"
+      >
+        <app-icon name="plus" [size]="18" />
+      </button>
+      @if (auth.user(); as user) {
+        <button
+          type="button"
+          class="btn btn--ghost btn--icon"
+          [cdkMenuTriggerFor]="userMenu"
+          aria-label="Account menu"
+        >
+          <app-avatar [person]="user" [size]="28" />
+        </button>
+      }
+    </header>
+
+    <main id="main" class="shell__content" tabindex="-1">
+      <router-outlet />
+    </main>
+  </div>
+</div>
+
+<nav class="tabbar" aria-label="Main navigation">
+  @for (tab of tabs; track tab.path) {
+    <a
+      class="tabbar__item"
+      [routerLink]="tab.path"
+      routerLinkActive="is-active"
+      [routerLinkActiveOptions]="{ exact: !!tab.exact }"
+      ariaCurrentWhenActive="page"
+    >
+      <app-icon [name]="tab.icon" [size]="20" />
+      {{ tab.label }}
+    </a>
+  }
+</nav>
