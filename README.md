@@ -4,7 +4,8 @@
 
 Angular client for Remly: a personal contacts app that remembers when you last saw someone, what you talked about and when you planned to meet again, and reminds you who you haven't seen in a while.
 
-- Backend: Remly-Backend, expected next to this repository
+- Live: [remly.space](https://remly.space)
+- Backend: [Remly-Backend](https://github.com/aleksa0206/Remly-Backend)
 
 ## What's inside
 
@@ -17,7 +18,7 @@ Angular client for Remly: a personal contacts app that remembers when you last s
 
 ## Design
 
-Same design system as the other apps (calm, quiet, content first) with Remly's own accent:
+The design system (tokens, base styles, components) is shared with HomeWise and StaffAway; Remly has its own accent colour:
 
 - warm paper background, white working surfaces, charcoal text and one plum accent;
 - colour always carries meaning (action, overdue, due today) and is paired with text or an icon;
