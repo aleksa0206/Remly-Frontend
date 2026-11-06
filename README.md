@@ -1,69 +1,53 @@
-<p align="center"><strong>People · Meetings · Keeping in touch</strong></p>
+# Remly Frontend
 
-# Remly — Frontend
+Angular client for Remly, a contacts app that remembers when you last saw someone and reminds you who you haven't seen in a while.
 
-Angular client for Remly: a personal contacts app that remembers when you last saw someone, what you talked about and when you planned to meet again, and reminds you who you haven't seen in a while.
+Live: [remly.space](https://remly.space) | Backend: [Remly-Backend](https://github.com/aleksa0206/Remly-Backend)
 
-- Live: [remly.space](https://remly.space)
-- Backend: [Remly-Backend](https://github.com/aleksa0206/Remly-Backend)
+## Screens
 
-## What's inside
+- Overview: planned meetings for the next two weeks, who is due for a catch-up, upcoming birthdays
+- Contacts: search, filters (favourites, archived, relationship) and sorting
+- Contact page: details, keep-in-touch interval, notes and meeting history
+- Meetings: log past meetings or plan new ones with one or more people
+- Account: profile and 2FA
 
-- **Overview** — what is coming up in the next two weeks (planned meetings, including ones whose day has passed and still need an "It happened"), who is due for a catch-up, birthdays in the next 30 days and the latest meetings.
-- **Contacts** — search by name, phone or email; filters for favourites, catch-up and archived; filter by relationship; sort by name, recently seen or catch-up date.
-- **Contact page** — details, birthday, "keep in touch" interval, notes, planned meetings and the full meeting history with notes.
-- **Meetings** — upcoming and history; log a meeting that happened or plan one ahead with one or more people, a time, a place and notes; mark planned ones as done, cancel or delete them.
-- **Account** — personal details and two-factor authentication.
-- **Installable (PWA)** — add it to the home screen on Android and iOS.
+It's a PWA, so it can be installed on a phone.
 
-## Design
+## Stack
 
-The design system (tokens, base styles, components) is shared with HomeWise and StaffAway; Remly has its own accent colour:
+Angular 22 (standalone components, signals, `rxResource`), Angular CDK, SCSS, Vitest, nginx, Docker.
 
-- warm paper background, white working surfaces, charcoal text and one plum accent;
-- colour always carries meaning (action, overdue, due today) and is paired with text or an icon;
-- IBM Plex Sans for the interface, Newsreader for page titles and the wordmark;
-- thin borders instead of shadows, lists as compact rows;
-- on phones (< 900 px): a top bar and a bottom tab bar.
-
-## Tech stack
-
-Angular 22 (standalone components, signals, `rxResource`) · Angular CDK (dialogs, menus, overlays) · SCSS design tokens · Vitest · nginx · Docker
-
-No UI component library and no state library: the look is built from `src/styles/_tokens.scss`, and list state (filters, view, page) lives in the URL.
+No UI library and no NgRx. Styles come from `src/styles/_tokens.scss` (shared with HomeWise and StaffAway), and filters/page state live in the URL.
 
 ## Running locally
 
 ```bash
 npm install
-npm start          # http://localhost:4200, expects the API at http://localhost:4000
-npm test           # unit tests (Vitest)
-npm run build      # production build into dist/
+npm start          # http://localhost:4200, API on http://localhost:4000
+npm test
+npm run build
 ```
 
-Set `FRONTEND_URL=http://localhost:4200` in the backend `.env`. The API URL lives in `src/environments/`. Create an account at `/register`.
+Set `FRONTEND_URL=http://localhost:4200` in the backend `.env`. API URL is in `src/environments/`.
 
-## Project structure
+## Structure
 
 ```
 src/app/
-  core/       API contracts and one service per resource, error normalization, auth (session,
-              interceptor, guards), change notifications
-  shared/     UI primitives (form field, dialogs, toast, icons), utilities (dates, due dates,
-              contact texts), editors (create/edit dialogs from anywhere)
-  layout/     app shell (sidebar / top bar + tab bar), auth layout, 403/404
+  core/       API services, auth (session, interceptor, guards)
+  shared/     UI components, date helpers, create/edit dialogs
+  layout/     app shell, auth layout, 403/404
   features/   overview, contacts, meetings, account, auth
-src/styles/   tokens → CSS variables, mixins, reset, base primitives
+src/styles/   tokens, mixins, base styles
 ```
 
-## Notable decisions
+## Notes
 
-- **Access token in memory only.** The session is restored through the httpOnly refresh cookie; parallel 401 responses share a single refresh because the backend rotates the refresh token.
-- **Reload by topic.** After a write, `Changes.notify('contacts' | 'meetings')` bumps a version signal that the affected resources depend on. Meeting writes notify both, because meetings move each contact's "last met" and "catch up" dates.
-- **The user's today is sent to the API** for the overview, so "today", "overdue" and birthdays match the user's calendar day, not the server's.
-- **Calendar dates are UTC midnight** and are formatted in UTC.
-- Dialogs are loaded lazily, which keeps the initial bundle under 500 kB.
+- The access token is kept only in memory. On reload the session comes back through the refresh cookie, and parallel 401s share one refresh call because the backend rotates the refresh token.
+- After saving something the app bumps a version signal for that area (`contacts` or `meetings`) and the pages that depend on it reload.
+- The overview sends the user's local date to the API, so "today" and "overdue" match the user's day and not the server's.
 
 ## Deployment
 
-The `Dockerfile` builds the same-origin variant (API under `/api`) and serves it with nginx, which also proxies `/api` to the backend. It is started by the backend's `docker-compose.prod.yaml`.
+The `Dockerfile` builds the app and serves it with nginx, which also proxies `/api` to the backend. It's started from the backend's `docker-compose.prod.yaml`.
